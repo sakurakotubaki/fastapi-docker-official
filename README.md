@@ -33,3 +33,17 @@ docker exec -it fastapi-container /bin/bash
 ```sh
 docker exec -it fastapi-container /bin/sh
 ```
+
+アプリコンテナに入る
+
+```sh
+docker exec -it fastapi-docker-official-db-1 psql -U postgres -d fastapi_db
+```
+
+psql 基本コマンド：
+|コマンド|	説明|
+|----|-----|
+|\dt	|テーブル一覧表示|
+|\d users	|usersテーブルの構造表示|
+|SELECT * FROM users;	|ユーザー一覧取得|
+|\q	|psql を終了|

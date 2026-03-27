@@ -1,24 +1,29 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 
+from app.database import engine, Base
+from app.controllers import RootController, ItemController, AuthController
+from app.exceptions.handlers import (
+    AppException,
+    app_exception_handler,
+    validation_exception_handler,
+)
 
-class RootController:
-    def __init__(self):
-        self.router = APIRouter()
-        self.router.add_api_route("/", self.read_root, methods=["GET"])
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
-    def read_root(self):
-        return {"Hello": "FastAPI"}
+# Create FastAPI app
+app = FastAPI(
+    title="FastAPI JWT Auth",
+    description="FastAPI with JWT Authentication and PostgreSQL",
+    version="1.0.0",
+)
 
+# Register exception handlers
+app.add_exception_handler(AppException, app_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-class ItemController:
-    def __init__(self):
-        self.router = APIRouter()
-        self.router.add_api_route("/items/{item_id}", self.read_item, methods=["GET"])
-
-    def read_item(self, item_id: int, q: str | None = None):
-        return {"item_id": item_id, "q": q}
-
-
-app = FastAPI()
+# Register routers
 app.include_router(RootController().router)
 app.include_router(ItemController().router)
+app.include_router(AuthController().router)
